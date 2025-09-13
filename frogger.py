@@ -6,7 +6,7 @@ clock = pygame.time.Clock()
 
 # scale image 2x + 10
 
-frog_sprite = pygame.image.load(f"{__file__[:-10]}/frog.png")
+frog_sprite = pygame.image.load(f"{__file__[:-10]}/Resources/frog.png")
 frog_sprite = pygame.transform.scale(frog_sprite, (46, 58))
 
 player = pygame.Rect((0, 300), (46, 58))
