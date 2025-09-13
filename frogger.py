@@ -6,8 +6,16 @@ clock = pygame.time.Clock()
 
 # scale image 2x + 10
 
+"""
+added log texture
+make it longer
+"""
+
 frog_sprite = pygame.image.load(f"{__file__[:-10]}/Resources/frog.png")
 frog_sprite = pygame.transform.scale(frog_sprite, (46, 58))
+
+raft_sprite = pygame.image.load(f"{__file__[:-10]}/Resources/log.png")
+raft_sprite = pygame.transform.scale(raft_sprite, (46, 58))
 
 player = pygame.Rect((0, 300), (46, 58))
 levelobj = pygame.Rect((0, 0), (46, 58))
@@ -134,7 +142,7 @@ while run:
     for log in logs:
 
        #move log
-       pygame.draw.rect(scr, (120, 90, 0), log)
+       scr.blit(raft_sprite, log)
        if direction == "down":
            log.y += 1.5
            direction = "up"
