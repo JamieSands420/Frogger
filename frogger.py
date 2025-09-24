@@ -3,7 +3,10 @@ import random
 
 pygame.init()
 
-scr = pygame.display.set_mode((900, 700))
+font = pygame.font.SysFont(None, 48)
+score = 0
+
+scr = pygame.display.set_mode((1100, 700))
 clock = pygame.time.Clock()
 
 # Load sprites
@@ -15,6 +18,10 @@ raft_sprite = pygame.transform.scale(raft_sprite, (46, 58))
 
 car_sprite = pygame.image.load(f"{__file__[:-10]}/Resources/Car.png")
 car_sprite = pygame.transform.scale(car_sprite, (46, 58))
+
+grass_sprite = pygame.image.load(f"{__file__[:-10]}/Resources/grass..png")
+grass_sprite = pygame.transform.scale(grass_sprite, (46, 58))
+
 flip_car_sprite = pygame.transform.flip(car_sprite, False, True)
 
 # Animated water sprites
@@ -101,7 +108,7 @@ def draw_level():
     for i in range(len(level)):
         for j in range(12):  # 12 tiles tall
             if level[i] == "g":
-                pygame.draw.rect(scr, (0, 66, 0), levelobj)
+                scr.blit(grass_sprite, levelobj)
             elif level[i] == "h":
                 pygame.draw.rect(scr, (60, 60, 60), levelobj)
             elif level[i] == "r":
@@ -131,6 +138,8 @@ populate_level()
 run = True
 while run:
     scr.fill((255, 255, 255))
+
+    scoreText = font.render(f"score: {score}", True, (0, 0, 0))
 
     draw_level()
 
@@ -173,18 +182,23 @@ while run:
             game_over()
 
     scr.blit(frog_sprite, player)
+    scr.blit(scoreText, (950, 0))
+    
     pygame.display.flip()
 
     for event in pygame.event.get():
         if event.type == pygame.KEYDOWN:
             if event.key == pygame.K_SPACE:
                 player.x += 46
+                score+=1
             elif event.key == pygame.K_UP:
                 player.y -= 58
             elif event.key == pygame.K_LEFT:
                 player.x -= 46
+                score-=1
             elif event.key == pygame.K_RIGHT:
                 player.x += 46
+                score+=1
             elif event.key == pygame.K_DOWN:
                 player.y += 58
 
