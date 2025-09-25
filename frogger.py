@@ -5,8 +5,9 @@ pygame.init()
 
 font = pygame.font.SysFont(None, 48)
 score = 0
+realScore = 0
 
-scr = pygame.display.set_mode((1100, 700))
+scr = pygame.display.set_mode((1120, 700))
 clock = pygame.time.Clock()
 
 # Load sprites
@@ -21,6 +22,11 @@ car_sprite = pygame.transform.scale(car_sprite, (46, 58))
 
 grass_sprite = pygame.image.load(f"{__file__[:-10]}/Resources/grass..png")
 grass_sprite = pygame.transform.scale(grass_sprite, (46, 58))
+
+play_button = pygame.image.load(f"{__file__[:-10]}/Resources/play.png")
+forfeit_button = pygame.image.load(f"{__file__[:-10]}/Resources/forfeit.png")
+
+button = pygame.Rect((920, 50), (200, 100))
 
 flip_car_sprite = pygame.transform.flip(car_sprite, False, True)
 
@@ -79,15 +85,15 @@ def populate_level():
     for i in range(len(level)):
         if level[i] == "h":
             if direction == "down":
-                cars.append(pygame.Rect((46 * i, 0 - random.randint(1, 50)), (46, 58)))
+                cars.append(pygame.Rect((46 * i, 0 - random.randint(1, 500)), (46, 58)))
             else:
-                cars.append(pygame.Rect((46 * i, 642 + random.randint(1, 50)), (46, 58)))
+                cars.append(pygame.Rect((46 * i, 642 + random.randint(1, 500)), (46, 58)))
 
         if level[i] == "r":
             if direction == "down":
-                logs.append(pygame.Rect((46 * i, 0 - random.randint(1, 50)), (46, 58)))
+                logs.append(pygame.Rect((46 * i, 0 - random.randint(1, 500)), (46, 58)))
             else:
-                logs.append(pygame.Rect((46 * i, 642 + random.randint(1, 50)), (46, 58)))
+                logs.append(pygame.Rect((46 * i, 642 + random.randint(1, 500)), (46, 58)))
 
         direction = "up" if direction == "down" else "down"
 
@@ -136,81 +142,107 @@ generate_level()
 populate_level()
 
 run = True
-while run:
-    scr.fill((255, 255, 255))
+while True:
+    while run:
+        scr.fill((255, 255, 255))
+        scr.blit(forfeit_button, button)
 
-    scoreText = font.render(f"score: {score}", True, (0, 0, 0))
+        scoreText = font.render(f"score: {realScore}", True, (0, 0, 0))
 
-    draw_level()
+        draw_level()
 
-    for log in logs:
-        scr.blit(raft_sprite, log)
-        if direction == "down":
-            log.y += 1.5
-            direction = "up"
-        else:
-            log.y -= 1.5
-            direction = "down"
+        for log in logs:
+            scr.blit(raft_sprite, log)
+            if direction == "down":
+                log.y += 1.5
+                direction = "up"
+            else:
+                log.y -= 1.5
+                direction = "down"
 
-        if log.y > 750:
-            log.y = 0 - random.randint(1, 50)
-        elif log.y < -50:
-            log.y = 700 + random.randint(1, 50)
+            if log.y > 750:
+                log.y = 0 - random.randint(1, 200)
+            elif log.y < -50:
+                log.y = 700 + random.randint(1, 200)
 
-        if log.x == player.x and not player.colliderect(log):
-            game_over()
+            if log.x == player.x and not player.colliderect(log):
+                game_over()
 
-    direction = "down"
+        direction = "down"
 
-    for car in cars:
-        scr.blit(car_sprite, car)
-        if direction == "down":
-            scr.blit(flip_car_sprite, car)
-            car.y += 1.5
-            direction = "up"
-        else:
+        for car in cars:
             scr.blit(car_sprite, car)
-            car.y -= 1.5
-            direction = "down"
+            if direction == "down":
+                scr.blit(flip_car_sprite, car)
+                car.y += 1.5
+                direction = "up"
+            else:
+                scr.blit(car_sprite, car)
+                car.y -= 1.5
+                direction = "down"
 
-        if car.y > 750:
-            car.y = 0 - random.randint(1, 50)
-        elif car.y < -50:
-            car.y = 700 + random.randint(1, 50)
+            if car.y > 750:
+                car.y = 0 - random.randint(1, 50)
+            elif car.y < -50:
+                car.y = 700 + random.randint(1, 50)
 
-        if car.colliderect(player):
-            game_over()
+            if car.colliderect(player):
+                game_over()
 
-    scr.blit(frog_sprite, player)
-    scr.blit(scoreText, (950, 0))
-    
-    pygame.display.flip()
+        scr.blit(frog_sprite, player)
+        scr.blit(scoreText, (925, 15))
+        
+        pygame.display.flip()
+        if realScore < score:
+            realScore = score
 
-    for event in pygame.event.get():
-        if event.type == pygame.KEYDOWN:
-            if event.key == pygame.K_SPACE:
-                player.x += 46
-                score+=1
-            elif event.key == pygame.K_UP:
-                player.y -= 58
-            elif event.key == pygame.K_LEFT:
-                player.x -= 46
-                score-=1
-            elif event.key == pygame.K_RIGHT:
-                player.x += 46
-                score+=1
-            elif event.key == pygame.K_DOWN:
-                player.y += 58
+        for event in pygame.event.get():
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_SPACE:
+                    player.x += 46
+                    score+=1
+                elif event.key == pygame.K_UP:
+                    player.y -= 58
+                elif event.key == pygame.K_LEFT:
+                    player.x -= 46
+                    score-=1
+                elif event.key == pygame.K_RIGHT:
+                    player.x += 46
+                    score+=1
+                elif event.key == pygame.K_DOWN:
+                    player.y += 58
 
+            if event.type == pygame.QUIT:
+                run = False
+
+            if event.type == pygame.MOUSEBUTTONDOWN:
+                if button.collidepoint(event.pos):
+                    run = False
+
+        if player.x == 874:
+            player.x = 0
+            generate_level()
+            populate_level()
+
+        water_frame += 0.05 
+        clock.tick(60)
+
+    for event in pygame.event.get():   
         if event.type == pygame.QUIT:
             run = False
+        if event.type == pygame.MOUSEBUTTONDOWN:
+            if button.collidepoint(event.pos):
+                # restart it
+                player.x = 0
+                generate_level()
+                populate_level()
+                realScore = 0
+                score = 0
+                run = True
+                player.y = 350
+        
+    scr.blit(play_button, button)
 
-    if player.x == 874:
-        player.x = 0
-        generate_level()
-        populate_level()
-
-    water_frame += 0.05 
-    clock.tick(60)
+    pygame.display.flip()
 
 pygame.quit()
