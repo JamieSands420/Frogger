@@ -1,11 +1,42 @@
 import pygame
+import os
 import random
+
+#max 13 highscores
 
 pygame.init()
 
 font = pygame.font.SysFont(None, 48)
+smallerFont = pygame.font.SysFont(None, 40)
 score = 0
 realScore = 0
+
+with open(f"{__file__[:-10]}/HiScores.dat", "r") as file:
+    highScores = file.readlines()
+
+def sort_highscores():
+    global highScores
+
+    tempHighScores = []
+    for i in range(len(highScores)):
+        tempHighScores.append(int(highScores[i]))
+
+    for i in range(len(tempHighScores)):
+        for j in range(len(tempHighScores) - 1):
+            temp = 0
+            if tempHighScores[j] < tempHighScores[j + 1]:
+                temp = tempHighScores[j]
+                tempHighScores[j] = tempHighScores[j + 1]
+                tempHighScores[j + 1] = temp
+
+    highScores = [] 
+    for i in range(len(tempHighScores)):
+        highScores.append(str(tempHighScores[i]))
+
+highScores = [line.strip() for line in highScores]
+print(highScores)
+
+sort_highscores()
 
 scr = pygame.display.set_mode((1120, 700))
 clock = pygame.time.Clock()
@@ -141,11 +172,19 @@ def game_over():
 generate_level()
 populate_level()
 
+main = True
 run = True
-while True:
+while main:
+    hiScoresText = [smallerFont.render(" High scores:", True, (0, 0, 0))]
     while run:
         scr.fill((255, 255, 255))
         scr.blit(forfeit_button, button)
+
+        hiScoresText = [smallerFont.render(" High scores:", True, (0, 0, 0))]
+        for i in range(len(highScores)):
+            hiScoresText.append(font.render(str(highScores[i]), True, (0, 0, 0)))
+            if i == 13:
+                pass
 
         scoreText = font.render(f"score: {realScore}", True, (0, 0, 0))
 
@@ -192,6 +231,10 @@ while True:
         scr.blit(frog_sprite, player)
         scr.blit(scoreText, (925, 15))
         
+        scr.blit(hiScoresText[0], (925, 150))
+        for i in range(len(hiScoresText)-1):
+            scr.blit(hiScoresText[i+1], (960, i*40+180))
+        
         pygame.display.flip()
         if realScore < score:
             realScore = score
@@ -227,22 +270,29 @@ while True:
         water_frame += 0.05 
         clock.tick(60)
 
+    if realScore != 0:
+        highScores.append(realScore-1)
+        sort_highscores()
+        
+    realScore = 0
+
+    scr.blit(play_button, button)
+    pygame.display.flip()
+
     for event in pygame.event.get():   
         if event.type == pygame.QUIT:
-            run = False
+            pygame.quit()
+            main = False
         if event.type == pygame.MOUSEBUTTONDOWN:
             if button.collidepoint(event.pos):
                 # restart it
                 player.x = 0
                 generate_level()
                 populate_level()
-                realScore = 0
                 score = 0
                 run = True
                 player.y = 350
-        
-    scr.blit(play_button, button)
-
-    pygame.display.flip()
-
-pygame.quit()
+                
+with open(f"{__file__[:-10]}/HiScores.dat", "a") as file:
+    for i in range(len(highScores)):
+        file.write(f"{highScores[i]}\n")
