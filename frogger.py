@@ -41,9 +41,14 @@ sort_highscores()
 scr = pygame.display.set_mode((1120, 700))
 clock = pygame.time.Clock()
 
+player_direction = "r"
+
 # Load sprites
-frog_sprite = pygame.image.load(f"{__file__[:-10]}/Resources/fox.png")
-frog_sprite = pygame.transform.scale(frog_sprite, (60, 68))
+
+fox_up = pygame.transform.scale(pygame.image.load(f"{__file__[:-10]}/Resources/fox_up.png"), (60, 68))
+fox_down = pygame.transform.scale(pygame.image.load(f"{__file__[:-10]}/Resources/fox_down.png"), (60, 68))
+fox_left = pygame.transform.scale(pygame.image.load(f"{__file__[:-10]}/Resources/fox_left.png"), (60, 68))
+fox_right = pygame.transform.scale(pygame.image.load(f"{__file__[:-10]}/Resources/fox_right.png"), (60, 68))
 
 raft_sprite = pygame.image.load(f"{__file__[:-10]}/Resources/log.png")
 raft_sprite = pygame.transform.scale(raft_sprite, (46, 58))
@@ -228,7 +233,15 @@ while main:
             if car.colliderect(player):
                 game_over()
 
-        scr.blit(frog_sprite, player)
+        if player_direction == "r":
+            scr.blit(fox_right, player)
+        elif player_direction == "l":
+            scr.blit(fox_left, player)
+        elif player_direction == "u":
+            scr.blit(fox_up, player)
+        else:
+            scr.blit(fox_down, player)
+
         scr.blit(scoreText, (925, 15))
         
         scr.blit(hiScoresText[0], (925, 150))
@@ -241,19 +254,20 @@ while main:
 
         for event in pygame.event.get():
             if event.type == pygame.KEYDOWN:
-                if event.key == pygame.K_SPACE:
+                if event.key == pygame.K_SPACE or event.key == pygame.K_RIGHT:
                     player.x += 46
-                    score+=1
+                    player_direction = "r"
+                    score += 1
                 elif event.key == pygame.K_UP:
                     player.y -= 58
+                    player_direction = "u"
                 elif event.key == pygame.K_LEFT:
                     player.x -= 46
-                    score-=1
-                elif event.key == pygame.K_RIGHT:
-                    player.x += 46
-                    score+=1
+                    player_direction = "l"
+                    score -= 1
                 elif event.key == pygame.K_DOWN:
                     player.y += 58
+                    player_direction = "d"
 
             if event.type == pygame.QUIT:
                 run = False
